@@ -1,7 +1,8 @@
 1. apply salted to the password.
-2. prevent xss injert for the task Create
+2. prevent xss injert for the task Create   => !!!!!!!!!Script cannot input!
 3. fix the config.inc to fit the marking schema.
 4. Edit a task, delete a task.
+5. https
 
 Your assignment should not make use of any extra libraries other than JQuery.
 All PHP, CSS, HTML must be your own. Your application must consist of 

@@ -358,11 +358,11 @@
 			var input = {};
 			input.title = $("#newtask_title").val();
 			input.description = $("#newtask_description").val();
-			input.duration = $("#newtask_duration").val();
+			input.duration = $("#duration-field").val();
 			//wrap the date to JSON string
 			var create_data = JSON.stringify(input);
 			//sending data to the model
-			
+			alert(create_data);
 			$.post("model/taskCreate.php", {create_task: create_data}, function(data) {
 				if (data['status'] == 'Success') {
 					console.log(data);
@@ -372,8 +372,29 @@
 					// else, error happens
 					showPageAlert('Create failed! Please try again.','fail');
 				}
-			});
-			
+			});	
+		}
+
+		function plus_duration() {
+			if ($("#duration-field").val()) {
+				var current = parseInt($("#duration-field").val());
+				if (current < 50) {
+					$("#duration-field").val(current + 1);
+				}
+			} else {
+				$("#duration-field").val(1);	
+			}
+		}
+
+		function minus_duration() {
+			if ($("#duration-field").val()) {
+				var current = parseInt($("#duration-field").val());
+				if (current > 0) {
+					$("#duration-field").val(current - 1);
+				}
+			} else {
+				$("#duration-field").val(0);
+			}
 		}
 		
 		function do_task(taskid) {
@@ -736,6 +757,15 @@
 				create_task();
 			});
 
+			$("#duration-button-plus").click(function(event){
+				event.preventDefault();
+				plus_duration();
+			});
+
+			$("#duration-button-minus").click(function(event){
+				event.preventDefault();
+				minus_duration();
+			});
 
 			/*
 				Do task
@@ -960,8 +990,8 @@
 						<label for="name" id="label-name" size="10">Slot (30 min as a unit)</label>
 						<span id="duration-table">
 							<button id="duration-button-minus"><img alt="minus" src="img/minus_duration.png" height="24" width="24"></button>
-							<input onKeyUp="this.value=this.value.replace(/\D/g,''); if(this.value > 50) this.value=50;" style="margin-left:0%" type="text" name="duration" placeholder="1~50"/>
-							<button id="duration-button-plus" onclick=""><img alt="add" src="img/plus_duration.png" height="24" width="24"></button>
+							<input onKeyUp="this.value=this.value.replace(/\D/g,''); if(this.value > 50) this.value=50;" style="margin-left:0%" type="text" name="duration" id="duration-field" placeholder="1~50"/>
+							<button id="duration-button-plus"><img alt="add" src="img/plus_duration.png" height="24" width="24"></button>
 						</span>
 						<br />
 						<br />

@@ -692,6 +692,7 @@ nav>ul>li>a.active {
     font-family: "Lato";
     font-size: 15px;
     height: 20%;
+    resize: none;
 }
 
 
