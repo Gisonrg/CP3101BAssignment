@@ -9,23 +9,26 @@
     $reply['receive'] = false;
     if (isset($_REQUEST['create_task'])) {
         $reply['receive'] = true;
-		$data = json_decode($_REQUEST['create_task'], true);
-		// get the task info
-		$userid = $_SESSION['valid_id'];
-		$title = $data['title'];
-		$description = $data['description'];
-		$duration = $data['duration'];
-		// //connect and query the database
-		$dbconn = db_connect();		
+		// $data = json_decode($_REQUEST['create_task'], true);
+		// // get the task info
+		// $userid = $_SESSION['valid_id'];
 
-		$result = pg_prepare($dbconn, "", 'insert into tasks values(nextval(\'tasks_id_seq\'), $1 , $2 , $3, $4, $5);');
-		$result = pg_execute($dbconn, "", array($userid, $title, $description, $duration, $duration));
+		// // Prevent XSS attack
+		// $title = htmlspecialchars($data['title'],ENT_NOQUOTES);
+		// $description = htmlspecialchars($data['description'],ENT_NOQUOTES);
+		
+		// $duration = $data['duration'];
+		// // //connect and query the database
+		// $dbconn = db_connect();		
 
-		if ($result) {
-			$reply['status'] = "Success";
-		} else {
-			$reply['status'] = "Error";
-		}
+		// $result = pg_prepare($dbconn, "", 'insert into tasks values(nextval(\'tasks_id_seq\'), $1 , $2 , $3, $4, $5);');
+		// $result = pg_execute($dbconn, "", array($userid, $title, $description, $duration, $duration));
+
+		// if ($result) {
+		// 	$reply['status'] = "Success";
+		// } else {
+		// 	$reply['status'] = "Error";
+		// }
 	}
 
 	echo json_encode($reply);
