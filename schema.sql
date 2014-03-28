@@ -16,8 +16,8 @@ DROP TABLE tasks;
 CREATE TABLE tasks (
 	id serial PRIMARY KEY NOT NULL,
 	userid integer,
-	title VARCHAR(40),
-	description VARCHAR(255),
+	title text,
+	description text,
 	totalslot integer,
 	remainingslot integer
 );

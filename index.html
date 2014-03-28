@@ -98,6 +98,12 @@
 
 		}
 
+		//create a in-memory div, set it's inner text(which jQuery automatically encodes)
+		//then grab the encoded contents back out.  The div never exists on the page.
+		function htmlEncode(value){
+		  return $('<div/>').text(value).html();
+		}
+
 		//-------------------------------------------------------------------------  
 		// Controller
 		//-------------------------------------------------------------------------
@@ -357,12 +363,14 @@
 			//get input data;
 			var input = {};
 			input.title = $("#newtask_title").val();
+			console.log(input.title);
 			input.description = $("#newtask_description").val();
+			console.log(input.description);
 			input.duration = $("#duration-field").val();
 			//wrap the date to JSON string
 			var create_data = JSON.stringify(input);
+			console.log(create_data);
 			//sending data to the model
-			alert(create_data);
 			$.post("model/taskCreate.php", {create_task: create_data}, function(data) {
 				if (data['status'] == 'Success') {
 					console.log(data);
@@ -422,6 +430,27 @@
 			
 		}
 
+		function edit_task(taskid) {
+			// open the GUI for task edit form
+		}
+
+		function delete_task(taskid) {
+			var id = JSON.stringify(taskid);
+			// $.getJSON("model/taskDelete.php",  {delete_task: id}, function(data) {
+			// 	if (data['status'] == 'Success') {
+			// 		// delete the task-item in the Dom
+					
+
+			// 		showPageAlert('Task deleted.','success');
+			// 	} else {
+					
+			// 		showPageAlert('Delete failed! Please try again.','fail');
+			// 	}
+			// });
+		}
+
+
+
 
 		//-------------------------------------------------------------------------  
 		// GUI
@@ -440,29 +469,30 @@
 			if (tasks.length<=0) {
 				//show empty task message
 				showElement('#warn');
-			} else {
-				if (locate == 'Task') {
-					showElement('#button-group');
-					$('#button-group > button').css("background-color","");
-					switch(mode) {
-						case 'all' : 
-							task_show_all(tasks, content);
-							$('#task-all').css("background-color","#217c99");
-							break;
-						case 'ongoing' :
-							task_show_ongoing(tasks, content);
-							$('#task-ongoing').css("background-color","#217c99");
-							break;
-						case 'finished' :
-							task_show_finished(tasks, content);
-							$('#task-finished').css("background-color","#217c99");
-							break;
-					}
-					
-				} else {
-					task_show_ongoing(tasks, content);
+			} 
+
+			if (locate == 'Task') {
+				showElement('#button-group');
+				$('#button-group > button').css("background-color","");
+				switch(mode) {
+					case 'all' : 
+						task_show_all(tasks, content);
+						$('#task-all').css("background-color","#217c99");
+						break;
+					case 'ongoing' :
+						task_show_ongoing(tasks, content);
+						$('#task-ongoing').css("background-color","#217c99");
+						break;
+					case 'finished' :
+						task_show_finished(tasks, content);
+						$('#task-finished').css("background-color","#217c99");
+						break;
 				}
+				
+			} else {
+				task_show_ongoing(tasks, content);
 			}
+		
 		}
 
 		function task_show_all(tasks, content) {
@@ -471,9 +501,9 @@
 				var task = tasks[i];
 				console.log(task);
 				if (task.remainingslot == 0) {
-					var current = "<div id=\"task-item-done\" name=\""+task.id+"\"><div id=\"task-title\"><a href=\"\">";
+					var current = "<div id=\"task-item-done\" name=\""+task.id+"\"><div class=\"task-title\"><a  data-name=\""+task.id+"\" href=\"\">";
 				} else {
-					var current = "<div id=\"task-item\" name=\""+task.id+"\"><div id=\"task-title\"><a href=\"\">";
+					var current = "<div id=\"task-item\" name=\""+task.id+"\"><div class=\"task-title\"><a  data-name=\""+task.id+"\" href=\"\">";
 				}
 		    	count++;
 		    	current+=task.title;
@@ -489,11 +519,24 @@
 		    	} else {
 		    		current+="/100%</span><button id=\"Do-task\" class=\"button-do\" onclick=\"do_task(";
 		    	}
-		    	current+=task.id;
+		    	current+=task.id+")\">DO</button></div>";
+
+				// task description
+				if (task.description.length ==0) {
+					task.description = '<i>*Empty*</i>'
+				}
+				current+="<div id=\"task-description\" style=\"display:none\"><span>Description</span><p>"+task.description+"</p>";
+
+				// options
+				current+="<li onclick=\"edit_task("; 
+				current+=task.id+")\"><img src=\"img/pencil.png\" width='15px' height='15px' alt=\"edit\">Edit</li><li onclick=\"delete_task(";
+				current+=task.id+")\"><img src=\"img/remove.png\" width='14px' height='14px' alt=\"delete\">Delete</li></div>"
+
+
 		    	if (task.remainingslot == 0) {
-		    		current+=")\">DO</button></div><div id=\"progressbar\"><div id=\"progressbar-percentage-done\" style=\"width:";
+		    		current+="<div id=\"progressbar\"><div id=\"progressbar-percentage-done\" style=\"width:";
 		    	} else {
-		    		current+=")\">DO</button></div><div id=\"progressbar\"><div id=\"progressbar-percentage\" style=\"width:";
+		    		current+="<div id=\"progressbar\"><div id=\"progressbar-percentage\" style=\"width:";
 				}
 				var bar = (1 - task.remainingslot/task.totalslot) * 100;
 				current+=bar;
@@ -509,6 +552,13 @@
 				hideElement('#warn');
 			}
 			$('#dashboard-task').html(content);
+
+			//activate the slide down menu.
+			$('.task-title > a').click(function(event) {
+				event.preventDefault();
+				var item = '[name=\"'+$(this).data().name+'\"] > #task-description'; 
+				$(item).slideToggle( "fast");
+			});
 		}
 
 		function task_show_ongoing(tasks, content) {
@@ -752,9 +802,31 @@
 			/* 
 				Task create form
 			*/
+			$('#newtask_title').change(function(){
+				if ($(this).val().length>30) {
+					$(this).css("border-color","red");
+			      	$('#newtask_form .form_alert .alert-text').html('The length of the title should less than 30 chars.');
+				  	showElement('#newtask_form .form_alert');
+				} else {
+					$(this).css("border-color","");
+					hideElement('#newtask_form .form_alert');
+				}
+			});
+
+			//validate create task form
 			$("#task_create_submit").click(function(event){
 				event.preventDefault();
-				create_task();
+				if ($('#newtask_title').val().length>40) {
+					$('#newtask_title').css("border-color","red");
+			      	$('#newtask_form .form_alert .alert-text').html('The length of the title should less than 30 chars.');
+				  	showElement('#newtask_form .form_alert');
+				} else if ($('#duration-field').val()=='') {
+					$('#duration-field').css("border-color","red");
+			      	$('#newtask_form .form_alert .alert-text').html('Please enter a valid number.(1 - 50)');
+			      	showElement('#newtask_form .form_alert');
+				} else {
+					create_task();
+				}
 			});
 
 			$("#duration-button-plus").click(function(event){
@@ -768,8 +840,12 @@
 			});
 
 			/*
-				Do task
+				Edit task
 			*/
+
+
+
+
 
 			//navigator, which acts as a controller
 			$("nav>ul>li>a").click(function(event){
@@ -813,8 +889,9 @@
 				redirect(data.mode);
 			});
 
-
 		});
+
+		
 		</script>
 
 	</head>
@@ -841,6 +918,7 @@
 		</div>
 		<div class="container container-pad">
 		<div id="page-alert" style="display:none"></div>
+
 		<!-- full page start -->
 		<div class="full-page" style="display:none">
 
@@ -980,7 +1058,7 @@
 				<div class="task-create" style="display:none">
 					<div id='tag'>Creating new task</div>
 					<form id='newtask_form'>
-						<div class="form_alert"></div>
+						<div class="form_alert" style="display:none"><div class="alert-text"></div></div>
 						<label for="name">Title</label>
 						<input id="newtask_title" type="text" name="title" placeholder="Your task title" required="required">
 						<br/>

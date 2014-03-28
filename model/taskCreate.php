@@ -15,9 +15,12 @@
 		$userid = $_SESSION['valid_id'];
 
 		// Prevent XSS attack
+		// encode all html special chars
 		$title = htmlspecialchars($data['title'], ENT_COMPAT,'ISO-8859-1', true);
 		$description = htmlspecialchars($data['description'], ENT_COMPAT,'ISO-8859-1', true);
-		
+
+		$reply['title'] = $title;
+		$reply['description'] = $description;
 		$duration =(int) $data['duration'];
 		// //connect and query the database
 		$dbconn = db_connect();		
