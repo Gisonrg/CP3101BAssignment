@@ -851,8 +851,12 @@ nav>ul>li>a.active {
 	font-family: "Lato";
 }
 
-.button-input:hover {
-	background: #16A085;
+.button-tag {
+	margin-top: 10px;
+	margin-left: 4px;
+	text-align:center;
+	width:20%;
+	font-family: "Lato";
 }
 
 .button .block {
@@ -873,11 +877,8 @@ nav>ul>li>a.active {
 }
 
 #button-group > button:hover {
-	background-color:#217c99;
+	background-color: #1B9B82;
 }
-
-
-
 
 
 /*End of button*/
