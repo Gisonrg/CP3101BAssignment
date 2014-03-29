@@ -1,5 +1,6 @@
-1. https
-2. Homepage display (unloggin)
+
+1. fix the config.inc to fit the marking schema.
+2. https
 
 Your assignment should not make use of any extra libraries other than JQuery.
 All PHP, CSS, HTML must be your own. Your application must consist of 
