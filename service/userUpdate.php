@@ -43,7 +43,8 @@
 			$result = pg_execute($dbconn, "", array($name, $old_pwd));
 
 			if ($result) {
-				if (pg_fetch_array($result)[0] >0) {
+				$row = pg_fetch_array($result);
+				if ($row[0] >0) {
 					$reply['status'] = "Success";
 					// the old password is correct
 					update_user($name, $email, $_SESSION['valid_id'], $new_pwd);

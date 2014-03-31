@@ -18,8 +18,9 @@
 			$reply['status'] = "Error";
 			goto end;
 		}
-
-		if (pg_fetch_array($result)[0]==0) {
+		$row = pg_fetch_array($result);
+		// echo $row;
+		if ($row[0]==0) {
 			$reply['status'] = "Success";
 			goto end;
 		} else {
